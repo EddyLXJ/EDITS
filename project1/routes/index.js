@@ -23,19 +23,26 @@ router.post('/login',jsonParser, function( req, res){
   let user = new User();
   user.find(username,function(err,result){
       if(err){
-          res.send('not found');
-      }
-      if (result.password !== password) {
-        res.json({message: "There seems to be an issue with the username/password combination that you entered"});
+          res.json({message: "There seems to be an issue with the username/password combination that you entered"});
       } else {
-        req.session.regenerate(function(err) {
-            if(err){
-              return res.json({message: "Login fail!"})
-            }
-            req.session.loginUser = username;
-            res.json({message: "Welcome," + username});
-          })
+        if (result) {
+          if (result.password !== password) {
+            res.json({message: "There seems to be an issue with the username/password combination that you entered"});
+          } else {
+            req.session.regenerate(function(err) {
+                if(err){
+                  return res.json({message: "Login fail!"})
+                }
+                req.session.loginUser = username;
+                res.json({message: "Welcome " + result.first_name});
+              })
+          }
+        } else {
+          res.json({message: "There seems to be an issue with the username/password combination that you entered"});
+        }
+
       }
+
   });
 } );
 
@@ -70,7 +77,7 @@ router.post('/add', jsonParser, function( req, res) {
       if (isNumber1 || isNumber2){
         res.json({message: "The numbers you entered are not valid"})
       } else {
-        res.json({message: "The action was successful", result: num1 + num2});
+        res.json({message: "The action was successful", result: parseInt(num1) + parseInt(num2)});
       }
     } else {
       res.json({message: "You are not currently logged in"});
@@ -92,7 +99,7 @@ router.post('/divide', jsonParser, function( req, res) {
       if (parseInt(num2) == 0){
         res.json({message: "The numbers you entered are not valid"})
       } else {
-        res.json({message: "The action was successful", result: num1/num2});
+        res.json({message: "The action was successful", result: parseInt(num1) / parseInt(num2)});
       }
     }
   } else {
@@ -112,7 +119,7 @@ router.post('/multiply', jsonParser, function( req, res) {
     if (isNumber1 || isNumber2){
       res.json({message: "The numbers you entered are not valid"})
     } else {
-      res.json({message: "The action was successful", result: num1 * num2});
+      res.json({message: "The action was successful", result: parseInt(num1) * parseInt(num2)});
     }
   } else {
     res.json({message: "You are not currently logged in"});
