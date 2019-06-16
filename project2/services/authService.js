@@ -1,5 +1,7 @@
+// authService: handle register and update the user information
 let User = require('../models/users');
 
+// register new user
 var register = function(fname, lname, address, city, state, zip, email, username, password) {
   return new Promise(function(resolve, reject) {
     let user = new User();
@@ -24,10 +26,9 @@ var register = function(fname, lname, address, city, state, zip, email, username
   });
 }
 
+// update user information
 var update = function(userId, parameter){
-
   return new Promise(function(resolve, reject) {
-
     if("username" in parameter){
       username = parameter["username"];
       let user = new User();
@@ -60,15 +61,24 @@ var update = function(userId, parameter){
       });
     }
   });
+}
 
-
-  if(fname != null){
-
-  }
-
+// view user by name
+var viewUser = function(parameter){
+  return new Promise(function(resolve, reject) {
+    let user = new User();
+    user.view(parameter, function( err, results) {
+      if(err){
+        reject(err);
+      } else {
+        resolve(results);
+      }
+    });
+  });
 }
 
 module.exports = {
   register: register,
-  update: update
+  update: update,
+  viewUser: viewUser
 }

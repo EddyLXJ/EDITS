@@ -7,5 +7,14 @@ var connection = mysql.createConnection({
     port: '3306',
     database: 'project2',
 });
+// get a connection from the pool
+connection.connect(function(err) {
+    if (err) {
+        console.log('[query] - :' + err);
+        return;
+    }
+    console.log('[connection connect]  succeed!');
+});
+
 
 module.exports = connection

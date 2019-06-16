@@ -1,13 +1,5 @@
 var connection = require('../config/config')
 var User = function() {};
-// get a connection from the pool
-connection.connect(function(err) {
-    if (err) {
-        console.log('[query] - :' + err);
-        return;
-    }
-    console.log('[connection connect]  succeed!');
-});
 
 // find one users
 User.prototype.find = function(username, callback) {
@@ -20,7 +12,7 @@ User.prototype.find = function(username, callback) {
         }
         callback(false, row[0]);
     });
-};
+}
 
 // register
 User.prototype.register = function(fname, lname, address, city, state, zip, email, username, password, callback){
@@ -41,9 +33,9 @@ User.prototype.register = function(fname, lname, address, city, state, zip, emai
 User.prototype.update = function(userId, parameter, callback){
     var temSql = "";
     for(var key in parameter){
-      temSql += "`"+key+"`='"+parameter[key]+ "'";
+      temSql += "`"+key+"`='"+parameter[key]+ "',";
     }
-    var sql = "UPDATE `tb_user` SET"+ temSql +" WHERE `user_id`='"+ userId +"';";
+    var sql = "UPDATE `tb_user` SET"+ temSql.slice(0, -1) +" WHERE `userId`='"+ userId +"';";
     console.log(sql);
     connection.query(sql, function(err,row, results) {
         if (err) {
@@ -53,5 +45,29 @@ User.prototype.update = function(userId, parameter, callback){
         callback(false, "updata success");
     });
 }
+
+// view user by any name
+User.prototype.view = function(parameter, callback) {
+  var temSql = "";
+  for(var key in parameter){
+    temSql += "`"+ key +"`like '%" + parameter[key] + "%' and ";
+  }
+
+  if(temSql.length != 0){
+    temSql = temSql.slice(0, -4);
+    var sql = "SELECT `fname`, `lname`, `userId` FROM `tb_user` WHERE " + temSql;
+  } else {
+    var sql = "SELECT `fname`, `lname`, `userId` FROM `tb_user`";
+  }
+  console.log(sql);
+  connection.query(sql, function(err,row, results) {
+      if (err) {
+          callback(true);
+          return;
+      }
+      callback(false, row);
+  });
+}
+
 
 module.exports = User;
