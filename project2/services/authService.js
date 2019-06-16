@@ -25,8 +25,9 @@ var register = function(fname, lname, address, city, state, zip, email, username
 }
 
 var update = function(userId, parameter){
+
   return new Promise(function(resolve, reject) {
-    var fields =
+
     if("username" in parameter){
       username = parameter["username"];
       let user = new User();
@@ -37,10 +38,26 @@ var update = function(userId, parameter){
           if(result) {
             reject({message: "The input you provided is not valid"});
           } else {
-
+            let user1 = new User();
+            user1.update(userId, parameter, function(err, results){
+              if(err){
+                reject(err);
+              } else{
+                resolve(results);
+              }
+            });
           }
         }
-      })
+      });
+    } else {
+      let user1 = new User();
+      user1.update(userId, parameter, function(err, results){
+        if(err){
+          reject(err);
+        } else{
+          resolve(results);
+        }
+      });
     }
   });
 
@@ -52,5 +69,6 @@ var update = function(userId, parameter){
 }
 
 module.exports = {
-  register: register
+  register: register,
+  update: update
 }

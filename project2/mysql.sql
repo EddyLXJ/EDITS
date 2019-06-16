@@ -15,3 +15,6 @@ CREATE TABLE IF NOT EXISTS `tb_user`(
 INSERT INTO `tb_user` ( `username`, `password`,`fname`, `lname`, `address`, `city`, `state`, `zip`, `email`)
 VALUES ( "hsmith", "smith", "Henry", "Smith", "4500 Centre Ave", "Pittburgh", "PA", "15213", "eddy.lxj@gmail.com");
 INSERT INTO `tb_user` ( `username`, `password`, `lname`) VALUES ("tbucktoo", "bucktoo", "Tim");
+UPDATE `tb_user`
+SET `fname`="bbb"
+WHERE `user_id`="1";

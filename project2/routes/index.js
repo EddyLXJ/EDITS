@@ -53,8 +53,17 @@ router.post('/updateInfo', jsonParser, function( req, res) {
   var loginUser = sess.loginUser;
   var userId = sess.userId;
   if (loginUser) {
-      
-
+      authService.update(userId, parameter)
+                  .then(function (success){
+                    if("fname" in parameter){
+                      var name = parameter["fname"];
+                    } else{
+                      var name = sess.fname;
+                    }
+                    res.json({message: name + " your information was successfully updated"});
+                  }, function( error ){
+                    res.json(error);
+                  });
   } else {
     res.json({message: "You are not currently logged in"})
   }
