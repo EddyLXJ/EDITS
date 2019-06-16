@@ -57,7 +57,7 @@ router.post('/logout', jsonParser, function( req, res) {
               return;
           }
           res.clearCookie(identityKey);
-          res.json({message:"You have been successful logged out"})
+          res.json({message:"You have been successfully logged out"})
       });
   } else {
     res.json({message: "You are not currently logged in"})
