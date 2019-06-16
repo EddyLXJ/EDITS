@@ -210,6 +210,15 @@ router.post('/viewUsers', jsonParser, function( req, res) {
 
 // view product
 router.post('/viewProducts', jsonParser, function( req, res) {
-  
+  productService.viewProduct(req.body)
+                .then(function(results) {
+                  if(results.length != 0){
+                    res.json({product: [results]});
+                  } else {
+                    res.json({message: "There are no products that match that criteria"});
+                  }
+                }, function(error){
+                  res.json({message: "Other errors"});
+                });
 })
 module.exports = router;

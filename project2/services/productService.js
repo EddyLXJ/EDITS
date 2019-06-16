@@ -47,8 +47,22 @@ var updateProduct = function(asin, productName, productDescription, group) {
   });
 }
 
+var viewProduct = function(parameter){
+  return new Promise(function(resolve, reject) {
+    let product = new Product();
+    product.viewProduct(parameter, function( err, result) {
+      if(err) {
+        reject(err);
+      } else {
+        resolve(result);
+      }
+    });
+  });
+}
+
 module.exports = {
   findProductByAsin: findProductByAsin,
   addProduct: addProduct,
-  updateProduct: updateProduct
+  updateProduct: updateProduct,
+  viewProduct: viewProduct
 }

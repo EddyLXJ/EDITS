@@ -28,3 +28,5 @@ VALUES ( "jadmin", "admin", "Haaenbvry", "Smaafbith", "4500 Centre Ave", "Pittbu
 UPDATE `tb_user`
 SET `fname`="bbb", `lname`="aaaa"
 WHERE `userId`="1";
+
+SELECT * FROM `tb_product` WHERE `productName` like "%a%" or `productDescription` like "%a%";

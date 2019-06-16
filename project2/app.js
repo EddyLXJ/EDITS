@@ -28,5 +28,4 @@ app.use('/', indexRouter);
 //   next(createError(404));
 // });
 
-
 module.exports = app;
