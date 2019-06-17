@@ -11,13 +11,13 @@ var find = function(username){
         if(err){
             reject({message: "There seems to be an issue with the username/password combination that you entered"});
         } else {
-          if (result.length != 0) {
+          if (result) {
             resolve(result);
           } else {
             reject({message: "There seems to be an issue with the username/password combination that you entered"});
           }
         }
-      }
+      })
   });
 }
 // register new user
@@ -99,5 +99,6 @@ var viewUser = function(parameter){
 module.exports = {
   register: register,
   update: update,
-  viewUser: viewUser
+  viewUser: viewUser,
+  find:find
 }
