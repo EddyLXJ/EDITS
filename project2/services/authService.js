@@ -1,6 +1,25 @@
 // authService: handle register and update the user information
 let User = require('../models/users');
 
+
+// find user
+
+var find = function(username){
+  return new Promise(function(resolve, reject) {
+    let user = new User();
+    user.find(username,function(err,result){
+        if(err){
+            reject({message: "There seems to be an issue with the username/password combination that you entered"});
+        } else {
+          if (result) {
+            resolve(result);
+          } else {
+            reject({message: "There seems to be an issue with the username/password combination that you entered"});
+          }
+        }
+      })
+  });
+}
 // register new user
 var register = function(fname, lname, address, city, state, zip, email, username, password) {
   return new Promise(function(resolve, reject) {
@@ -17,7 +36,7 @@ var register = function(fname, lname, address, city, state, zip, email, username
             if(err){
               reject(err);
             } else {
-              resolve(result);
+              setTimeout(resolve(result),30);
             }
           });
         }
@@ -80,5 +99,6 @@ var viewUser = function(parameter){
 module.exports = {
   register: register,
   update: update,
-  viewUser: viewUser
+  viewUser: viewUser,
+  find:find
 }

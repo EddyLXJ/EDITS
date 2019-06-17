@@ -73,38 +73,29 @@ router.post('/updateInfo', jsonParser, function( req, res) {
 router.post('/login',jsonParser, function( req, res){
   const username = req.body.username;
   const password = req.body.password;
-
-  let user = new User();
-  user.find(username,function(err,result){
-      if(err){
-          res.json({message: "There seems to be an issue with the username/password combination that you entered"});
-      } else {
-        if (result) {
-          if (result.password !== password) {
-            res.json({message: "There seems to be an issue with the username/password combination that you entered"});
-          } else {
-            req.session.regenerate(function(err) {
-                if(err){
-                  return res.json({message: "Login fail!"})
-                }
-                if(req.body.username == "jadmin"){
-                  req.session.role = "admin";
-                } else {
-                  req.session.role = "normal"
-                }
-                req.session.loginUser = username;
-                req.session.userId = result.user_id;
-                req.session.fname = result.fname;
-		    console.log("2222");
-                res.json({message: "Welcome " + result.fname});
-              })
-          }
-        } else {
-          res.json({message: "There seems to be an issue with the username/password combination that you entered"});
-        }
-      }
-
-  });
+  authService.find(username)
+            .then(function(result) {
+              if (result.password !== password) {
+                res.json({message: "There seems to be an issue with the username/password combination that you entered"});
+              } else {
+                req.session.regenerate(function(err) {
+                    if(err){
+                      return res.json({message: "Login fail!"})
+                    }
+                    if(req.body.username == "jadmin"){
+                      req.session.role = "admin";
+                    } else {
+                      req.session.role = "normal"
+                    }
+                    req.session.loginUser = username;
+                    req.session.userId = result.user_id;
+                    req.session.fname = result.fname;
+                    res.json({message: "Welcome " + result.fname});
+                  });
+              }
+            }, function(error){
+              res.json(error);
+            });
 } );
 
 // Logout
