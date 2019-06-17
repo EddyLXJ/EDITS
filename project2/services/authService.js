@@ -36,7 +36,7 @@ var register = function(fname, lname, address, city, state, zip, email, username
             if(err){
               reject(err);
             } else {
-              setTimeout(resolve(result),30);
+              resolve(result);
             }
           });
         }
@@ -95,6 +95,7 @@ var viewUser = function(parameter){
     });
   });
 }
+
 
 module.exports = {
   register: register,
