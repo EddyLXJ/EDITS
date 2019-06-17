@@ -22,7 +22,6 @@ var find = function(username){
 }
 // register new user
 var register = function(fname, lname, address, city, state, zip, email, username, password) {
-  sleep(30);
   return new Promise(function(resolve, reject) {
     let user = new User();
     user.find(username, function(err, result){
@@ -98,15 +97,6 @@ var viewUser = function(parameter){
   });
 }
 
-function sleep(numberMillis) {
-	var now = new Date();
-	var exitTime = now.getTime() + numberMillis;
-	while (true) {
-		now = new Date();
-		if (now.getTime() > exitTime)
-		return;
-	    }
-}
 
 module.exports = {
   register: register,
