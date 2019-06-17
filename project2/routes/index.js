@@ -6,6 +6,7 @@ var User = require('../models/users');
 var users = require('../mockUser/users').items;
 var authService = require('../services/authService');
 var productService = require('../services/productService');
+var common = require('../common/common');
 var identityKey = 'skey';
 var findUser = function(name, password){
     return users.find(function(item){
@@ -33,11 +34,11 @@ router.post('/registerUser', jsonParser, function( req, res){
   || email == null || email.length == 0 || zip == null || zip.length == 0 || state == null || state.length == 0
   || city == null || city.length == 0 || address == null || address.length == 0 || lname == null || lname.length == 0
   || fname == null || fname.length == 0){
-    res.json({message: "The input you provided is not valid"});
+    res.json({message: common.INPUT_INVALID});
   } else{
     authService.register(fname, lname, address, city, state, zip, email, username, password)
                 .then(function (fname) {
-                  res.json({message: fname + " was registered successfully"});
+                  res.json({message: fname + common.REGISTER_SUCCESS});
                 }, function( error ){
                   res.json(error);
                 })
@@ -58,12 +59,12 @@ router.post('/updateInfo', jsonParser, function( req, res) {
                     } else{
                       var name = sess.fname;
                     }
-                    res.json({message: name + " your information was successfully updated"});
+                    res.json({message: name + common.INFO_UPDATED});
                   }, function( error ){
                     res.json(error);
                   });
   } else {
-    res.json({message: "You are not currently logged in"})
+    res.json({message: common.NOT_LOG_IN});
   }
 
 })
@@ -75,7 +76,7 @@ router.post('/login',jsonParser, function( req, res){
   authService.find(username)
             .then(function(result) {
               if (result.password !== password) {
-                res.json({message: "There seems to be an issue with the username/password combination that you entered"});
+                res.json({message: common.PASSWORD_INVALID});
               } else {
                 req.session.regenerate(function(err) {
                     if(err){
@@ -87,13 +88,13 @@ router.post('/login',jsonParser, function( req, res){
                       req.session.role = "normal"
                     }
                     req.session.loginUser = username;
-                    req.session.userId = result.user_id;
+                    req.session.userId = result.userId;
                     req.session.fname = result.fname;
-                    res.json({message: "Welcome " + result.fname});
+                    res.json({message: common.WELCOME + result.fname});
                   });
               }
             }, function(error){
-		res.json({"message" : "There seems to be an issue with the username/password combination that you entered"});
+		            res.json({message : common.PASSWORD_INVALID});
 	    });
 
 } );
@@ -109,10 +110,10 @@ router.post('/logout', jsonParser, function( req, res) {
               return;
           }
           res.clearCookie(identityKey);
-          res.json({message:"You have been successfully logged out"})
+          res.json({message:common.LOG_OUT});
       });
   } else {
-    res.json({message: "You are not currently logged in"})
+    res.json({message: common.NOT_LOG_IN});
   }
 });
 
@@ -127,25 +128,26 @@ router.post('/addProducts', jsonParser, function( req, res) {
   if (loginUser) {
     if(sess.role == "admin"){
       if(asin == null || asin.length == 0 || productName == null || productName.length == 0 || productDescription == null || productDescription.length == 0 || group == null || group.length == 0){
-        res.json({message: "The input you provided is not valid"});
+        res.json({message: common.INPUT_INVALID});
       } else {
         productService.findProductByAsin(asin)
                     .then(function(result){
-                      res.json({message: "The input you provided is not valid"});
+                      res.json({message: common.INPUT_INVALID});
                     }, function(error) {
                       productService.addProduct(asin, productName, productDescription, group)
                                     .then(function(success){
-                                      res.json({message: productName + " was successfully added to the system"});
+                                      console.log(productName);
+                                      res.json({message: productName + common.ADD_PRODUCT});
                                     }, function(error) {
-                                      res.json({message: "The input you provided is not valid"});
+                                      res.json({message: common.INPUT_INVALID});
                                     });
                     });
       }
     } else {
-      res.json({message: "You must be an admin to perform this action"});
+      res.json({message: common.MUST_ADMIN});
     }
   } else {
-    res.json({message: "You are not currently logged in"});
+    res.json({message: common.NOT_LOG_IN});
   }
 });
 
@@ -160,20 +162,21 @@ router.post('/modifyProduct', jsonParser, function( req, res) {
   if (loginUser) {
     if(sess.role == "admin"){
       if(asin == null || asin.length == 0 || productName == null || productName.length == 0 || productDescription == null || productDescription.length == 0 || group == null || group.length == 0){
-        res.json({message: "The input you provided is not valid"});
+        res.json({message: common.INPUT_INVALID});
       } else {
         productService.updateProduct(asin, productName, productDescription, group)
                       .then(function(success){
-                        res.json({message: productName + " was successfully updated"});
+                        console.log(productName);
+                        res.json({message: productName + common.PRODUCT_UPDATE});
                       }, function(error) {
-                        res.json({message: "The input you provided is not valid"});
+                        res.json({message: common.INPUT_INVALID});
                       })
       }
     } else {
-      res.json({message: "You must be an admin to perform this action"});
+      res.json({message: common.MUST_ADMIN});
     }
   } else {
-    res.json({message: "You are not currently logged in"});
+    res.json({message: common.NOT_LOG_IN});
   }
 });
 
@@ -187,18 +190,18 @@ router.post('/viewUsers', jsonParser, function( req, res) {
                 .then(function(results){
                   if(results.length != 0){
 
-                    res.json({message: "The action was successful", user:results});
+                    res.json({message: common.ACTION_SUCCESS, user:results});
                   } else{
-                    res.json({message: "There are no users that match that criteria"});
+                    res.json({message: common.NO_USER});
                   }
                 }, function(error) {
                   res.json({message: "Other errors"});
                 })
     } else {
-      res.json({message: "You must be an admin to perform this action"});
+      res.json({message: common.MUST_ADMIN});
     }
   } else {
-    res.json({message: "You are not currently logged in"});
+    res.json({message: common.NOT_LOG_IN});
   }
 });
 
@@ -207,9 +210,10 @@ router.post('/viewProducts', jsonParser, function( req, res) {
   productService.viewProduct(req.body)
                 .then(function(results) {
                   if(results.length != 0){
+                    console.log(results);
                     res.json({product: results});
                   } else {
-                    res.json({message: "There are no products that match that criteria"});
+                    res.json({message: common.NO_PRODUCTS});
                   }
                 }, function(error){
                   res.json({message: "Other errors"});

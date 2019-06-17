@@ -1,5 +1,6 @@
 // authService: handle register and update the user information
 let User = require('../models/users');
+let common = require('../common/common');
 
 
 // find user
@@ -9,12 +10,12 @@ var find = function(username){
     let user = new User();
     user.find(username,function(err,result){
         if(err){
-            reject({message: "There seems to be an issue with the username/password combination that you entered"});
+            reject({message: common.PASSWORD_INVALID});
         } else {
           if (result) {
             resolve(result);
           } else {
-            reject({message: "There seems to be an issue with the username/password combination that you entered"});
+            reject({message: common.PASSWORD_INVALID});
           }
         }
       })
@@ -26,10 +27,10 @@ var register = function(fname, lname, address, city, state, zip, email, username
     let user = new User();
     user.find(username, function(err, result){
       if(err){
-        reject({message: "The input you provided is not valid"})
+        reject({message: common.INPUT_INVALID})
       } else {
         if(result) {
-          reject({message: "The input you provided is not valid"});
+          reject({message: common.INPUT_INVALID});
         } else {
           let user1 = new User();
           user1.register(fname, lname, address, city, state, zip, email, username, password, function(err, result){
@@ -53,10 +54,10 @@ var update = function(userId, parameter){
       let user = new User();
       user.find(username, function(err, result){
         if(err){
-          reject({message: "The input you provided is not valid"})
+          reject({message: common.INPUT_INVALID})
         } else {
           if(result) {
-            reject({message: "The input you provided is not valid"});
+            reject({message: common.INPUT_INVALID});
           } else {
             let user1 = new User();
             user1.update(userId, parameter, function(err, results){

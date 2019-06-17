@@ -9,7 +9,7 @@ var findProductByAsin = function(asin) {
 
     product.findByAsin(asin, function( err, result) {
       if(err) {
-        reject({message: "The input you provided is not valid"});
+        reject({message: common.INPUT_INVALID});
       } else {
         if (result) {
           resolve(result);
