@@ -36,7 +36,6 @@ var register = function(fname, lname, address, city, state, zip, email, username
             if(err){
               reject(err);
             } else {
-
               resolve(result);
             }
           });

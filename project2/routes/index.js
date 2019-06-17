@@ -79,7 +79,7 @@ router.post('/login',jsonParser, function( req, res){
               } else {
                 req.session.regenerate(function(err) {
                     if(err){
-                      return res.json({message: "Login fail!"})
+                      res.json({message: "Login fail!"})
                     }
                     if(req.body.username == "jadmin"){
                       req.session.role = "admin";
@@ -93,8 +93,8 @@ router.post('/login',jsonParser, function( req, res){
                   });
               }
             }, function(error){
-              res.json(error);
-            });
+		res.json({"message" : "There seems to be an issue with the username/password combination that you entered"});
+	    });
 
 } );
 
@@ -186,7 +186,8 @@ router.post('/viewUsers', jsonParser, function( req, res) {
       authService.viewUser(req.body)
                 .then(function(results){
                   if(results.length != 0){
-                    res.json({message: "The action was successful", user:[results]});
+
+                    res.json({message: "The action was successful", user:results});
                   } else{
                     res.json({message: "There are no users that match that criteria"});
                   }
@@ -206,7 +207,7 @@ router.post('/viewProducts', jsonParser, function( req, res) {
   productService.viewProduct(req.body)
                 .then(function(results) {
                   if(results.length != 0){
-                    res.json({product: [results]});
+                    res.json({product: results});
                   } else {
                     res.json({message: "There are no products that match that criteria"});
                   }
