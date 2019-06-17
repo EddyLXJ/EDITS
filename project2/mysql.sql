@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS `tb_user`(
 CREATE TABLE IF NOT EXISTS `tb_product`(
   `asin` VARCHAR(100) NOT NULL,
   `productName` VARCHAR(1000) NOT NULL,
-  `productDescription` VARCHAR(100000) NOT NULL,
+  `productDescription` VARCHAR(50000) NOT NULL,
   `group` VARCHAR(100) NOT NULL,
   PRIMARY KEY ( `asin` )
 );
