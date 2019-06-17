@@ -78,7 +78,7 @@ router.post('/login',jsonParser, function( req, res){
       if(err){
           res.json({message: "There seems to be an issue with the username/password combination that you entered"});
       } else {
-        if (result) {
+        if (result.length != 0) {
           if (result.password !== password) {
             res.json({message: "There seems to be an issue with the username/password combination that you entered"});
           } else {
