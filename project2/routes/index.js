@@ -37,6 +37,7 @@ router.post('/registerUser', jsonParser, function( req, res){
   } else{
     authService.register(fname, lname, address, city, state, zip, email, username, password)
                 .then(function (fname) {
+			console.log("1111");
                   res.json({message: fname + " was registered successfully"});
                 }, function( error ){
                   res.json(error);
@@ -94,6 +95,7 @@ router.post('/login',jsonParser, function( req, res){
                 req.session.loginUser = username;
                 req.session.userId = result.user_id;
                 req.session.fname = result.fname;
+		    console.log("2222");
                 res.json({message: "Welcome " + result.fname});
               })
           }

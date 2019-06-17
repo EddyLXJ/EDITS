@@ -4,7 +4,8 @@ var User = function() {};
 // find one users
 User.prototype.find = function(username, callback) {
     var sql = "SELECT * FROM `tb_user` WHERE username = '" + username + "'";
-    // make the query
+    console.log(sql);
+	// make the query
     connection.query(sql, function(err,row, results) {
         if (err) {
             callback(true);
