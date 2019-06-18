@@ -1,5 +1,5 @@
 // authService: handle register and update the user information
-let User = require('../models/users');
+var User = require('../models/users');
 let common = require('../common/common');
 
 
@@ -7,42 +7,32 @@ let common = require('../common/common');
 
 var find = function(username){
   return new Promise(function(resolve, reject) {
-    let user = new User();
-    user.find(username,function(err,result){
-        if(err){
-            reject({message: common.PASSWORD_INVALID});
-        } else {
-          if (result) {
-            resolve(result);
+    User.find(username)
+        .then(function(user){
+          if (user.length != 0){
+            resolve(user);
           } else {
             reject({message: common.PASSWORD_INVALID});
           }
-        }
-      })
+        });
   });
 }
 // register new user
 var register = function(fname, lname, address, city, state, zip, email, username, password) {
   return new Promise(function(resolve, reject) {
-    let user = new User();
-    user.find(username, function(err, result){
-      if(err){
-        reject({message: common.INPUT_INVALID})
-      } else {
-        if(result) {
-          reject({message: common.INPUT_INVALID});
-        } else {
-          let user1 = new User();
-          user1.register(fname, lname, address, city, state, zip, email, username, password, function(err, result){
-            if(err){
-              reject(err);
-            } else {
-              resolve(result);
-            }
-          });
-        }
-      }
-    });
+    User.find(username)
+        .then(function(user){
+          if(user.length != 0) {
+            reject({message: common.INPUT_INVALID});
+          } else {
+            User.register(fname, lname, address, city, state, zip, email, username, password)
+                .then(function(success){
+                  resolve(fname);
+                }, function(err){
+                  reject({message: common.INPUT_INVALID});
+                });
+          }
+        });
   });
 }
 
@@ -51,34 +41,27 @@ var update = function(userId, parameter){
   return new Promise(function(resolve, reject) {
     if("username" in parameter){
       username = parameter["username"];
-      let user = new User();
-      user.find(username, function(err, result){
-        if(err){
-          reject({message: common.INPUT_INVALID})
-        } else {
-          if(result) {
-            reject({message: common.INPUT_INVALID});
-          } else {
-            let user1 = new User();
-            user1.update(userId, parameter, function(err, results){
-              if(err){
-                reject(err);
-              } else{
-                resolve(results);
-              }
-            });
-          }
-        }
-      });
+      User.find(username)
+          .then(function(user) {
+            if(user.length != 0) {
+              reject({message: common.INPUT_INVALID});
+            } else {
+              User.update(parameter, userId)
+                  .then(function(success){
+                    resolve(success);
+                  },function(err){
+                    reject(err);
+                  });
+            }
+          });
     } else {
-      let user1 = new User();
-      user1.update(userId, parameter, function(err, results){
-        if(err){
-          reject(err);
-        } else{
-          resolve(results);
-        }
-      });
+      
+      User.update(parameter, userId)
+                  .then(function(success){
+                    resolve(success);
+                  },function(err){
+                    reject(err);
+                  });
     }
   });
 }
@@ -86,14 +69,15 @@ var update = function(userId, parameter){
 // view user by name
 var viewUser = function(parameter){
   return new Promise(function(resolve, reject) {
-    let user = new User();
-    user.view(parameter, function( err, results) {
-      if(err){
-        reject(err);
-      } else {
-        resolve(results);
-      }
-    });
+    User.view(parameter)
+        .then(function(results){
+          resolve(results);
+        }, function(err){
+          reject(err);
+        })
+        .catch(function(err){
+          console.log(err);
+        });
   });
 }
 

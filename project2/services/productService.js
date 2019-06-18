@@ -5,58 +5,48 @@ var Product = require("../models/products");
 //find product by asin
 var findProductByAsin = function(asin) {
   return new Promise(function(resolve, reject) {
-    let product = new Product();
-
-    product.findByAsin(asin, function( err, result) {
-      if(err) {
-        reject({message: common.INPUT_INVALID});
-      } else {
-        if (result) {
-          resolve(result);
-        } else {
-          reject("Empty set");
-        }
-      }
-    });
-  });
+    Product.findByAsin(asin)
+          .then(function(result){
+            if (result.length != 0){
+              resolve(result[0]);
+            } else {
+              reject("Empty set");
+            }
+          });
+        });
 }
 
 var addProduct = function(asin, productName, productDescription, group) {
   return new Promise(function(resolve, reject) {
-      let product = new Product();
-      product.addProduct(asin, productName, productDescription, group, function( err, result) {
-        if(err){
-          reject(err);
-        } else{
-          resolve(result);
-        }
-      });
+      Product.addProduct(asin, productName, productDescription, group)
+            .then(function(success){
+              resolve(success);
+            }, function(err) {
+              reject(err);
+            });
   });
 }
 
 var updateProduct = function(asin, productName, productDescription, group) {
   return new Promise(function(resolve, reject) {
-      let product = new Product();
-      product.updateProduct(asin, productName, productDescription, group, function( err, result) {
-        if(err){
-          reject(err);
-        } else{
-          resolve(result);
-        }
-      });
+      Product.updateProduct(asin, productName, productDescription, group)
+            .then(function(success) {
+              resolve(success);
+            }, function(err){
+              reject(err);
+            });
+      
   });
 }
 
 var viewProduct = function(parameter){
   return new Promise(function(resolve, reject) {
-    let product = new Product();
-    product.viewProduct(parameter, function( err, result) {
-      if(err) {
-        reject(err);
-      } else {
-        resolve(result);
-      }
-    });
+    Product.viewProduct(parameter)
+          .then(function(success) {
+            resolve(success);
+          }, function(err){
+            reject(err);
+          });
   });
 }
 

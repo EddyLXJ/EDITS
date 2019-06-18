@@ -1,75 +1,93 @@
-var connection = require('../config/config');
-var Product = function() {};
+let Sequelize = require('sequelize');
+let sequelize = require('../config/config');
 
-// search product by asin
-Product.prototype.findByAsin = function(asin, callback) {
-  var sql = "SELECT * FROM `tb_product` WHERE asin = '" + asin +"';";
+let Product = sequelize.define('tb_product', {
+  asin: {
+    field: "asin",
+    primaryKey: true,
+    type: Sequelize.STRING(255),
+    allowNull: false
+  },
+  productName: {
+    field: "productName",
+    type: Sequelize.STRING(255),
+    allowNull: false,
+  },
+  productDescription: {
+    field: 'productDescription',
+    type: Sequelize.STRING(10000),
+    allowNull: false
+  },
+  group: {
+    field: 'group',
+    type: Sequelize.STRING(255),
+    allowNull: false
+  }
+}, {
+  freezeTableName: true
+});
 
-  // make the query
-  connection.query(sql, function(err,row, results) {
-      if (err) {
-          callback(err);
-          return;
-      }
-      callback(false, row[0]);
+let product = Product.sync({force: true});
+
+var findByAsin = function(asin){
+  return Product.findAll({
+    where: {
+      asin: asin
+    }
   });
 }
 
-// add product
-Product.prototype.addProduct = function(asin, productName, productDescription, group, callback) {
-  var sql = "INSERT INTO `tb_product` ( `asin`, `productName`, `productDescription`, `group`) VALUES ('"+ asin + "', '"+ productName +"', '" + productDescription +"', '"+ group +"');";
-  // make the query
-  console.log(sql);
-  connection.query(sql, function(err,row, results) {
-      if (err) {
-          callback(err);
-          console.log(err);
-          return;
-      }
-      console.log("4444");
-      callback(false, row[0]);
+var addProduct = function(asin, productName, productDescription, group) {
+  return Product.create({
+    asin: asin,
+    productName: productName,
+    productDescription: productDescription,
+    group: group
   });
 }
 
-// update product
-Product.prototype.updateProduct = function(asin, productName, productDescription, group, callback) {
-  var sql = "UPDATE `tb_product` SET `productName` = '" + productName + "', `productDescription` = '" + productDescription +"', `group` = '" + group + "' WHERE `asin` = '" + asin + "';"
-  // make the query
-  connection.query(sql, function(err,row, results) {
-      if (err) {
-          callback(err);
-          console.log(err);
-          return;
-      }
-      callback(false, row[0]);
-  });
-}
-
-// view product
-Product.prototype.viewProduct = function(parameter, callback){
-  var temSql = "";
-  for(var key in parameter){
-    if(key == "keyword"){
-      temSql += "(`productName` like '%" + parameter[key] +"%' or `productDescription` like '%" + parameter[key] +"%') and ";
-    } else {
-      temSql += "`" + key +"` = '"+ parameter[key] + "' and ";
+var updateProduct = function(asin, productName, productDescription, group) {
+  parm = {"productName" :productName, "productDescription": productDescription, "group": group};
+  return Product.update(
+    parm,
+    {
+    where:{
+      asin: asin
     }
   }
+  );
+}
 
-  if(temSql.length != 0){
-    temSql = temSql.slice(0, -4);
-    var sql = "SELECT `asin`, `productName` FROM `tb_product` WHERE " + temSql;
-  } else {
-    var sql = "SELECT `asin`, `productName` FROM `tb_product`";
+var viewProduct = function(parameter) {
+  const Op = Sequelize.Op;
+  parameter1 = {}
+
+  if("asin" in parameter){
+    parameter1["asin"] = parameter.asin;
   }
-  console.log(sql);
-  connection.query(sql, function(err,row, results) {
-      if (err) {
-          callback(true);
-          return;
-      }
-      callback(false, row);
+  if("group" in parameter){
+    parameter1["group"] = parameter.group;
+  }
+  if("keyword" in parameter){
+    parameter1[Op.or] = [
+      {"productName": {[Op.like]:'%' + parameter.keyword + '%'}},
+      {"productDescription": {[Op.like]:'%' + parameter.keyword + '%'}}
+    ];
+  }
+
+  if(!("asin" in parameter) && !("group" in parameter) && !("keyword" in parameter)){
+    parameter1["asin"] = {[Op.like]: `%`};
+  }
+
+  return Product.findAll({
+    where: parameter1,
+    attributes: ['asin', 'productName']
   });
 }
 
-module.exports = Product;
+module.exports = {
+  findByAsin: findByAsin,
+  addProduct: addProduct,
+  updateProduct: updateProduct,
+  viewProduct: viewProduct
+}

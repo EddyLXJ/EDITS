@@ -75,7 +75,7 @@ router.post('/login',jsonParser, function( req, res){
   const password = req.body.password;
   authService.find(username)
             .then(function(result) {
-              if (result.password !== password) {
+              if (result[0].password !== password) {
                 res.json({message: common.PASSWORD_INVALID});
               } else {
                 req.session.regenerate(function(err) {
@@ -88,9 +88,9 @@ router.post('/login',jsonParser, function( req, res){
                       req.session.role = "normal"
                     }
                     req.session.loginUser = username;
-                    req.session.userId = result.userId;
-                    req.session.fname = result.fname;
-                    res.json({message: common.WELCOME + result.fname});
+                    req.session.userId = result[0].userId;
+                    req.session.fname = result[0].fname;
+                    res.json({message: common.WELCOME + result[0].fname});
                   });
               }
             }, function(error){
@@ -166,7 +166,6 @@ router.post('/modifyProduct', jsonParser, function( req, res) {
       } else {
         productService.updateProduct(asin, productName, productDescription, group)
                       .then(function(success){
-                        console.log(productName);
                         res.json({message: productName + common.PRODUCT_UPDATE});
                       }, function(error) {
                         res.json({message: common.INPUT_INVALID});
@@ -189,7 +188,6 @@ router.post('/viewUsers', jsonParser, function( req, res) {
       authService.viewUser(req.body)
                 .then(function(results){
                   if(results.length != 0){
-
                     res.json({message: common.ACTION_SUCCESS, user:results});
                   } else{
                     res.json({message: common.NO_USER});
@@ -210,7 +208,6 @@ router.post('/viewProducts', jsonParser, function( req, res) {
   productService.viewProduct(req.body)
                 .then(function(results) {
                   if(results.length != 0){
-                    console.log(results);
                     res.json({product: results});
                   } else {
                     res.json({message: common.NO_PRODUCTS});
