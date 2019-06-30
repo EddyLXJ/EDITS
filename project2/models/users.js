@@ -1,73 +1,137 @@
-var connection = require('../config/config')
-var User = function() {};
+let Sequelize = require('sequelize');
+let sequelize = require('../config/config');
 
-// find one users
-User.prototype.find = function(username, callback) {
-    var sql = "SELECT * FROM `tb_user` WHERE username = '" + username + "'";
-    console.log(sql);
-    connection.query(sql, function(err,row, results) {
-        if (err) {
-            callback(true);
-            return;
-        }
-        callback(false, row[0]);
-    });
-}
-
-// register
-User.prototype.register = function(fname, lname, address, city, state, zip, email, username, password, callback){
-    var sql = "INSERT INTO `tb_user` ( `username`, `password`,`fname`, `lname`, `address`, `city`, `state`, `zip`, `email`) VALUES ( '" + username + "', '" + password + "', '" + fname +"', '"+ lname +"', '"+ address +"', '"+ city +"', '" + state +"', '" + zip +"', '" + email +"');";
-    // make the query
-    console.log(sql);
-    connection.query(sql, function(err,row, results) {
-        if (err) {
-            // console.log(err);
-            callback(true);
-            return;
-        }
-        callback(false, fname);
-    });
-}
-
-// update
-User.prototype.update = function(userId, parameter, callback){
-    var temSql = "";
-    for(var key in parameter){
-      temSql += "`"+key+"`='"+parameter[key]+ "',";
+let User = sequelize.define('tb_user', {
+    userId: {
+        field: 'userId',
+        primaryKey: true,
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        autoIncrement: true
+    },
+    username: {
+        field: 'username',
+        type: Sequelize.STRING(255),
+        allowNull: false,
+    },
+    password: {
+        field: 'password',
+        type: Sequelize.STRING(255),
+        allowNull: false
+    },
+    fname: {
+        field: 'fname',
+        type: Sequelize.STRING(255),
+        allowNull: false
+    },
+    lname: {
+        field: 'lname',
+        type: Sequelize.STRING(255),
+        allowNull: false
+    },
+    address: {
+        field: 'address',
+        type: Sequelize.STRING(255),
+        allowNull: false
+    },
+    city: {
+        field: 'city',
+        type: Sequelize.STRING(255),
+        allowNull: false
+    },
+    state: {
+        field: 'state',
+        type: Sequelize.STRING(255),
+        allowNull: false
+    },
+    zip: {
+        field: 'zip',
+        type: Sequelize.STRING(255),
+        allowNull: false
+    },
+    email: {
+        field: 'email',
+        type: Sequelize.STRING(255),
+        allowNull: false
     }
-    var sql = "UPDATE `tb_user` SET"+ temSql.slice(0, -1) +" WHERE `userId`='"+ userId +"';";
-    console.log(sql);
-    connection.query(sql, function(err,row, results) {
-        if (err) {
-            callback(true);
-            return;
-        }
-        callback(false, "updata success");
-    });
-}
-
-// view user by any name
-User.prototype.view = function(parameter, callback) {
-  var temSql = "";
-  for(var key in parameter){
-    temSql += "`"+ key +"`like '%" + parameter[key] + "%' and ";
-  }
-
-  if(temSql.length != 0){
-    temSql = temSql.slice(0, -4);
-    var sql = "SELECT `fname`, `lname`, `userId` FROM `tb_user` WHERE " + temSql;
-  } else {
-    var sql = "SELECT `fname`, `lname`, `userId` FROM `tb_user`";
-  }
-  console.log(sql);
-  connection.query(sql, function(err,row, results) {
-      if (err) {
-          callback(true);
-          return;
-      }
-      callback(false, row);
+  }, {
+    freezeTableName: true
   });
-}
 
+  let user = User.sync({force: true}).then(() => {
+    // Table created
+    return  User.create({
+        fname: "Jenny",
+        lname: "Admin",
+        address: "4500",
+        city: "P",
+        state: "PA",
+        zip: "zip",
+        password: "admin",
+        username: "jadmin",
+        email: "aaaa"
+      });
+});
 
-module.exports = User;
+  var find = function(username) {
+      return User.findAll({
+          where: {
+              username: username
+          }
+      });
+  }
+
+  var register = function(fname, lname, address, city, state, zip, email, username, password) {
+    return User.create({
+        fname: fname,
+        lname: lname,
+        address: address,
+        city: city,
+        state: state,
+        zip: zip,
+        password: password,
+        username: username,
+        email: email
+      });
+  }
+
+  var update = function(parameter, userId) {
+    return User.update(
+        parameter,
+        {
+        where: {
+            userId: userId
+        }
+    }
+    );
+  }
+
+  var view = function(parameter) {
+    const Op = Sequelize.Op;
+    parameter1 = {}
+    if("fname" in parameter){
+        if( parameter.fname.length != 0){
+        parameter1["fname"] = {[Op.like]: '%' + parameter.fname + '%'}
+        }
+    }
+    if("lname" in parameter){
+        if( parameter.lname.length != 0){
+        parameter1["lname"] = {[Op.like]: '%' + parameter.lname + '%'}
+        }
+    }
+    if(!("fname" in parameter1) && !("lname" in parameter1)){
+        parameter1["fname"] = {[Op.like]: `%`};
+    }
+    
+    return User.findAll({
+        where: parameter1,
+        attributes: ['fname', 'lname', 'userId']
+    });
+  }
+
+  module.exports = {
+      find:find,
+      register:register,
+      update:update,
+      view:view
+  }
