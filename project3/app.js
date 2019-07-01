@@ -7,7 +7,7 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var session = require('express-session');
 var FileStore = require('session-file-store')(session);
-
+var mongo = require("./config/mongo");
 var identityKey = 'skey';
 var app = express();
 app.use(session({

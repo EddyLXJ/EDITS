@@ -2,10 +2,13 @@ var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
 var jsonParser = bodyParser.json();
-var User = require('../models/users');
+// var User = require('../models/users');
 var users = require('../mockUser/users').items;
-var authService = require('../services/authService');
-var productService = require('../services/productService');
+//var authService = require('../services/authService');
+var authService = require('../services/authMongoService');
+// var productService = require('../services/productService');
+var productService = require('../services/productMongoService');
+var purchaseService = require('../services/purchaseService');
 var common = require('../common/common');
 var identityKey = 'skey';
 var findUser = function(name, password){
@@ -75,7 +78,7 @@ router.post('/login',jsonParser, function( req, res){
   const password = req.body.password;
   authService.find(username)
             .then(function(result) {
-              if (result[0].password !== password) {
+              if (result.password !== password) {
                 res.json({message: common.PASSWORD_INVALID});
               } else {
                 req.session.regenerate(function(err) {
@@ -88,9 +91,9 @@ router.post('/login',jsonParser, function( req, res){
                       req.session.role = "normal"
                     }
                     req.session.loginUser = username;
-                    req.session.userId = result[0].userId;
-                    req.session.fname = result[0].fname;
-                    res.json({message: common.WELCOME + result[0].fname});
+                    req.session.userId = result.userId;
+                    req.session.fname = result.fname;
+                    res.json({message: common.WELCOME + result.fname});
                   });
               }
             }, function(error){
@@ -215,5 +218,52 @@ router.post('/viewProducts', jsonParser, function( req, res) {
                 }, function(error){
                   res.json({message: "Other errors"});
                 });
-})
+});
+
+// purchase Product
+router.post('/buyProducts', jsonParser, function( req, res) {
+  var products = req.body.products;
+  var sess = req.session;
+  var loginUser = sess.loginUser;
+  var userId = sess.userId;
+  if (loginUser) {
+    purchaseService.purchase(userId, products)
+                  .then(function(result){
+                    if(result == "success"){
+                      res.json({message:common.ACTION_SUCCESS});
+                    } else {
+                      res.json({message:common.NO_PRODUCTS});
+                    }
+                  }, function(err){
+                    res.json(err);
+                  });
+  } else {
+    res.json({message: common.NOT_LOG_IN});
+  }
+});
+
+// get history
+router.post('/productsPurchased', jsonParser, function( req, res) {
+  var username = req.body.username;
+  var sess = req.session;
+  var loginUser = sess.loginUser;
+  if (loginUser) {
+    if(sess.role == "admin"){
+      purchaseService.getHistory(username)
+                    .then(function(result){
+                      if(result){
+                        res.json({message: common.ACTION_SUCCESS, products: result});
+                      } else {
+                        res.json({message: common.NO_USER});
+                      }
+                    }, function(err) {
+                      res.json({message: common.NO_USER});
+                    });
+    } else {
+      res.json({message: common.MUST_ADMIN});
+    }
+  } else {
+    res.json({message: common.NOT_LOG_IN});
+  }
+});
 module.exports = router;
