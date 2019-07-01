@@ -14,7 +14,8 @@ const message = {
     "PRODUCT_UPDATE": " was successfully updated",
     "ACTION_SUCCESS": "The action was successful",
     "NO_USER": "There are no users that match that criteria",
-    "NO_PRODUCTS": "There are no products that match that criteria"   
+    "NO_PRODUCTS": "There are no products that match that criteria",
+    "NO_RECOMMENDATIONS": "There are no recommendations for that product" 
 }
 
 module.exports = message;

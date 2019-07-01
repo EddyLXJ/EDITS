@@ -98,5 +98,6 @@ module.exports = {
   findProductByAsin: findProductByAsin,
   addProduct: addProduct,
   updateProduct: updateProduct,
-  viewProduct: viewProduct
+  viewProduct: viewProduct,
+
 }

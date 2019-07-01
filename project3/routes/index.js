@@ -230,6 +230,11 @@ router.post('/buyProducts', jsonParser, function( req, res) {
     purchaseService.purchase(userId, products)
                   .then(function(result){
                     if(result == "success"){
+
+                      if(products.length > 1){
+                        
+                        purchaseService.updateRecommendation(products);
+                      }
                       res.json({message:common.ACTION_SUCCESS});
                     } else {
                       res.json({message:common.NO_PRODUCTS});
@@ -266,4 +271,26 @@ router.post('/productsPurchased', jsonParser, function( req, res) {
     res.json({message: common.NOT_LOG_IN});
   }
 });
+
+// get recommendation
+router.post('/getRecommendations', jsonParser, function( req, res ){
+  var asin = req.body.asin;
+  var sess = req.session;
+  var loginUser = sess.loginUser;
+  var userId = sess.userId;
+  if (loginUser) {
+    purchaseService.getRecommendations(asin)
+                  .then(function(results){
+                    if(results){
+                      res.json({message: common.ACTION_SUCCESS, products: results});
+                    } else {
+                      res.json({message: common.NO_RECOMMENDATIONS});
+                    }
+                  }, function(error){
+                    res.json({message: common.NO_RECOMMENDATIONS});
+                  });
+  } else {
+    res.json({message: common.NOT_LOG_IN});
+  }
+})
 module.exports = router;
