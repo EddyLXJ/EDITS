@@ -30,3 +30,5 @@ SET `fname`="bbb", `lname`="aaaa"
 WHERE `userId`="1";
 
 SELECT * FROM `tb_product` WHERE `productName` like "%a%" or `productDescription` like "%a%";
+
+
