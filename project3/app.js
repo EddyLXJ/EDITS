@@ -6,14 +6,20 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var session = require('express-session');
+var redis = require('redis');
+var RedisStore = require('connect-redis')(session);
 var FileStore = require('session-file-store')(session);
 var mongo = require("./config/mongo");
+var common = require("./common/common.js");
 var identityKey = 'skey';
 var app = express();
+
+var redisClient = redis.createClient(common.redisPort, common.redisMysql);
+// {auth_pass: 'password'}
 app.use(session({
     name: identityKey,
     secret: 'eddyli',
-    store: new FileStore(),
+    store: new RedisStore({client: redisClient}),
     saveUninitialized: false,
     resave: false,
     cookie: {

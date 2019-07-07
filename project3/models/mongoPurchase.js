@@ -1,3 +1,4 @@
+// Schema for Purchase History
 const mongoose = require("mongoose");
 var purchaseSchema = mongoose.Schema({
   userId:Number,

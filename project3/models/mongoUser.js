@@ -1,3 +1,4 @@
+// Schema for User
 const mongoose = require("mongoose");
 var userSchema = mongoose.Schema({
   userId: Number,

@@ -1,3 +1,4 @@
+// Purchase services for buy product and recommendation
 var PurchaseModel = require("../models/mongoPurchase");
 var ProductModel = require("../models/mongoProduct");
 var UserModel = require("../models/mongoUser");
@@ -179,6 +180,7 @@ var getRecommendations = function(asin){
   });
 }
 
+// define own compare function to compare object
 function compare(property){
          return function(obj1,obj2){
              var value1 = obj1[property];

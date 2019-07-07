@@ -1,3 +1,5 @@
 {
-  "mongoUri": "mongodb://localhost/products"
+  "mongoUri": "mongodb://localhost/products",
+  "redisPort": 6379,
+  "redisMysql": "127.0.0.1"
 }

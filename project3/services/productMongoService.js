@@ -25,7 +25,7 @@ var addProduct = function(asin, productName, productDescription, group){
       asin: asin,
       productName: productName,
       productDescription: productDescription,
-      group:[[group]]
+      group:[group]
     }
     ProductModel.findOne({asin:asin}, function(error, product){
         if(product){
@@ -46,7 +46,7 @@ var updateProduct = function(asin, productName, productDescription, group) {
       asin:asin,
       productName:productName,
       productDescription: productDescription,
-      group:[[group]]
+      group:[group]
     }
     ProductModel.findOne({asin:asin}, function(error, product) {
       if(product){

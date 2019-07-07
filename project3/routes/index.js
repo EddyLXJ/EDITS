@@ -3,7 +3,7 @@ var router = express.Router();
 var bodyParser = require('body-parser');
 var jsonParser = bodyParser.json();
 // var User = require('../models/users');
-var users = require('../mockUser/users').items;
+// var users = require('../mockUser/users').items;
 //var authService = require('../services/authService');
 var authService = require('../services/authMongoService');
 // var productService = require('../services/productService');
@@ -232,7 +232,6 @@ router.post('/buyProducts', jsonParser, function( req, res) {
                     if(result == "success"){
 
                       if(products.length > 1){
-                        
                         purchaseService.updateRecommendation(products);
                       }
                       res.json({message:common.ACTION_SUCCESS});
