@@ -10,7 +10,7 @@ var redis = require('redis');
 var RedisStore = require('connect-redis')(session);
 var FileStore = require('session-file-store')(session);
 var mongo = require("./config/mongo");
-var common = require("./common/common.js");
+var common = require("./config/application");
 var identityKey = 'skey';
 var app = express();
 
