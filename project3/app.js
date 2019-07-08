@@ -19,6 +19,7 @@ var redisClient = redis.createClient(common.redisPort, common.redisMysql);
 app.use(session({
     name: identityKey,
     secret: 'eddyli',
+   // store: new FileStore(),
     store: new RedisStore({client: redisClient}),
     saveUninitialized: false,
     resave: false,

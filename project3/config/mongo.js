@@ -1,6 +1,9 @@
 const mongoose = require("mongoose");
 const config = require("./application");
-mongoose.connect(config.mongoUri, { useNewUrlParser: true });
+const fs = require('fs');
+mongoose.connect(config.mongoUri, { useNewUrlParser: true ,ssl: true,
+    sslValidate: false,
+    sslCA: fs.readFileSync('./rds-combined-ca-bundle.pem')}).then(()=>{console.log("connected")});
 
 const db = mongoose.connection;
 

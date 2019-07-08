@@ -38,7 +38,7 @@ var purchase = function(userId, products){
         parameter1.push(tem);
       }
       var new_len = parameter1.length;
-      if(new_len != ori_len){
+      if(new_len == 0){
         reject({message: common.NO_PRODUCTS});
       } else {
         PurchaseModel.findOne({userId:userId}, function(err, user){

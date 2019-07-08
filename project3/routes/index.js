@@ -23,7 +23,7 @@ router.get('/', function(req, res, next) {
 
 // Register
 router.post('/registerUser', jsonParser, function( req, res){
-
+ console.log('registerUser');
   const fname = req.body.fname; //first_name
   const lname = req.body.lname; //last_name
   const address = req.body.address; //address
@@ -50,6 +50,7 @@ router.post('/registerUser', jsonParser, function( req, res){
 
 //updateInfo
 router.post('/updateInfo', jsonParser, function( req, res) {
+ console.log('updateInfo');
   var parameter = req.body;
   var sess = req.session;
   var loginUser = sess.loginUser;
@@ -74,6 +75,7 @@ router.post('/updateInfo', jsonParser, function( req, res) {
 
 // Login
 router.post('/login',jsonParser, function( req, res){
+	console.log('login');
   const username = req.body.username;
   const password = req.body.password;
   authService.find(username)
@@ -84,7 +86,7 @@ router.post('/login',jsonParser, function( req, res){
                 req.session.regenerate(function(err) {
                     if(err){
                       res.json({message: "Login fail!"})
-                    }
+                    } else {
                     if(req.body.username == "jadmin"){
                       req.session.role = "admin";
                     } else {
@@ -94,7 +96,9 @@ router.post('/login',jsonParser, function( req, res){
                     req.session.userId = result.userId;
                     req.session.fname = result.fname;
                     res.json({message: common.WELCOME + result.fname});
+		    }
                   });
+		
               }
             }, function(error){
 		            res.json({message : common.PASSWORD_INVALID});
@@ -104,6 +108,7 @@ router.post('/login',jsonParser, function( req, res){
 
 // Logout
 router.post('/logout', jsonParser, function( req, res) {
+	console.log('logout');
   var sess = req.session;
   var loginUser = sess.loginUser;
   if (loginUser) {
@@ -122,6 +127,7 @@ router.post('/logout', jsonParser, function( req, res) {
 
 // add products
 router.post('/addProducts', jsonParser, function( req, res) {
+	console.log('addproducts');
   const asin = req.body.asin;
   const productName = req.body.productName;
   const productDescription = req.body.productDescription;
@@ -156,6 +162,7 @@ router.post('/addProducts', jsonParser, function( req, res) {
 
 // modify product
 router.post('/modifyProduct', jsonParser, function( req, res) {
+	console.log('modifyproduct');
   const asin = req.body.asin;
   const productName = req.body.productName;
   const productDescription = req.body.productDescription;
@@ -184,6 +191,7 @@ router.post('/modifyProduct', jsonParser, function( req, res) {
 
 // view users
 router.post('/viewUsers', jsonParser, function( req, res) {
+	console.log('viewUsers');
   var sess = req.session;
   var loginUser = sess.loginUser;
   if (loginUser) {
@@ -208,6 +216,7 @@ router.post('/viewUsers', jsonParser, function( req, res) {
 
 // view product
 router.post('/viewProducts', jsonParser, function( req, res) {
+	console.log('viesProducts');
   productService.viewProduct(req.body)
                 .then(function(results) {
                   if(results.length != 0){
@@ -222,6 +231,7 @@ router.post('/viewProducts', jsonParser, function( req, res) {
 
 // purchase Product
 router.post('/buyProducts', jsonParser, function( req, res) {
+	console.log('buyproducts');
   var products = req.body.products;
   var sess = req.session;
   var loginUser = sess.loginUser;
@@ -248,6 +258,7 @@ router.post('/buyProducts', jsonParser, function( req, res) {
 
 // get history
 router.post('/productsPurchased', jsonParser, function( req, res) {
+	console.log('productsPurchasesd');
   var username = req.body.username;
   var sess = req.session;
   var loginUser = sess.loginUser;
@@ -273,6 +284,7 @@ router.post('/productsPurchased', jsonParser, function( req, res) {
 
 // get recommendation
 router.post('/getRecommendations', jsonParser, function( req, res ){
+	console.log('/getRecommendations');
   var asin = req.body.asin;
   var sess = req.session;
   var loginUser = sess.loginUser;

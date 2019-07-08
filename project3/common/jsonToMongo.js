@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 const co = require('co');
-mongoose.connect("mongodb://localhost/products", { useNewUrlParser: true });
+const config = require("../config/application");
+const fs = require('fs');
+mongoose.connect(config.mongoUri, { useNewUrlParser: true ,ssl: true,
+    sslValidate: false,
+    sslCA: fs.readFileSync('../config/rds-combined-ca-bundle.pem')});
 
 const db = mongoose.connection;
 var productSchema = mongoose.Schema({
@@ -11,8 +15,7 @@ var productSchema = mongoose.Schema({
 });
 
 var ProductModel = mongoose.model("ProductModel", productSchema);
-var fileName = '../../../project3script/projectRecordsJSON.json';
-
+var fileName = '../../../projectRecordsJSON.json';
 var lineReader = require('line-reader');
 var execute = true;
 var totalRecords = 0;

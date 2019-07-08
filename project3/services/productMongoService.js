@@ -71,7 +71,7 @@ var viewProduct = function(parameter){
     parameter1["asin"] = parameter.asin;
   }
   if("group" in parameter){
-    parameter1["group"] = [[parameter.group]];
+    parameter1["group"] = [parameter.group];
   }
   if("keyword" in parameter){
     parameter1["$or"] = [

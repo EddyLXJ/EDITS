@@ -1,5 +1,5 @@
 {
-  "mongoUri": "mongodb://localhost/products",
+  "mongoUri": "mongodb://project31:123456999@docdb-2019-07-08-13-49-34.cluster-cybumkdukdgl.us-east-1.docdb.amazonaws.com:27017/products",
   "redisPort": 6379,
-  "redisMysql": "127.0.0.1"
+  "redisMysql": "project3-1.u21w2a.ng.0001.use1.cache.amazonaws.com"
 }
