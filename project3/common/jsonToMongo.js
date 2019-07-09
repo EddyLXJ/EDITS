@@ -4,7 +4,7 @@ const config = require("../config/application");
 const fs = require('fs');
 mongoose.connect(config.mongoUri, { useNewUrlParser: true ,ssl: true,
     sslValidate: false,
-    sslCA: fs.readFileSync('../config/rds-combined-ca-bundle.pem')});
+    sslCA: fs.readFileSync('../rds-combined-ca-bundle.pem')});
 
 const db = mongoose.connection;
 var productSchema = mongoose.Schema({

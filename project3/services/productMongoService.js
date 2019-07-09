@@ -42,7 +42,7 @@ var addProduct = function(asin, productName, productDescription, group){
 // update Product
 var updateProduct = function(asin, productName, productDescription, group) {
   return new Promise((resolve, reject) => {
-    product = {
+    new_product = {
       asin:asin,
       productName:productName,
       productDescription: productDescription,
@@ -50,7 +50,7 @@ var updateProduct = function(asin, productName, productDescription, group) {
     }
     ProductModel.findOne({asin:asin}, function(error, product) {
       if(product){
-        ProductModel.updateOne({asin:asin},product,function(err, product){
+        ProductModel.updateOne({asin:asin},new_product,function(err, product){
           if(err){
             reject(err);
           } else {
