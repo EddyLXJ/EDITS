@@ -7,7 +7,7 @@ var productSchema = mongoose.Schema({
   asin:String,
   productName:String,
   productDescription:String,
-  group:[String],
+  group:String,
 });
 
 var ProductModel = mongoose.model("ProductModel", productSchema);
@@ -37,7 +37,7 @@ lineReader.eachLine(fileName, function(line, last) {
       asin: asin,
       productName: productName,
       productDescription: productDescription,
-      group:[group]
+      group:group
     }
     var nProduct = new ProductModel(newProduct);
     nProduct.save();
