@@ -6,7 +6,7 @@ var RecomModel = require("../models/mongoRecommendation");
 var common = require("../common/common");
 
 // add purchase
-var purchase = function(userId, products){
+var purchase = async function(userId, products){
 
   parameter = {}
   for(let product of products){
@@ -22,23 +22,39 @@ var purchase = function(userId, products){
   for(let key in parameter){
     array.push(key);
   }
+  // var ori_len = array.length;
+  // let pro = await ProductModel.find({asin:{$in:array}}, {asin:1, productName:1, quantity:1}).exec();
+  // updata_arr = []
+  // for(let p of pro){
+  //   let asin = p["asin"]
+  //   let q = p["quantity"]
+  //   let c_q = parameter[asin]
+  //   if(q >= c_q){
+  //     for(let i = 0;i < c_q; i ++){
+  //       updata_arr.push(asin)
+  //     }
+  //   }
+  // }
+  // console.log(updata_arr);
 
-  var ori_len = array.length;
   return new Promise((resolve, reject) => {
+
     ProductModel.find({asin:{$in:array}}, {asin:1, productName:1}, function(err, products){
-      var parameter1 = [];
+      if(products.length > 1){
+        updateRecommendation(products);
+      }
+      var parameter1 = {};
       for(let product of products){
-        var tem = {};
-        var asin = product["asin"];
         var productName = product["productName"];
         var quantity = parameter[asin];
-        tem["asin"] = asin;
-        tem["productName"] = productName;
-        tem["quantity"] = quantity;
-        parameter1.push(tem);
+        if(productName in parameter1){
+          parameter1[productName] += quantity;
+        } else {
+          parameter1[productName] = quantity;
+        }
       }
-      var new_len = parameter1.length;
-      if(new_len != ori_len){
+      var new_len = products.length;
+      if(new_len == 0){
         reject({message: common.NO_PRODUCTS});
       } else {
         PurchaseModel.findOne({userId:userId}, function(err, user){
@@ -46,7 +62,16 @@ var purchase = function(userId, products){
             reject(err);
           } else {
             if(user){
-              PurchaseModel.updateOne({userId:userId}, {$push:{products:{$each: parameter1}}}, function(err, success){
+              new_products = user.products;
+              for(let key in parameter1){
+                if(key in new_products){
+                  new_products[key] += parameter1[key];
+                } else {
+                  new_products[key] = parameter1[key];
+                }
+              }
+
+              PurchaseModel.updateOne({userId:userId}, {$set:{products: new_products}}, function(err, success){
                 if(err){
                   reject(err);
                 } else {
@@ -68,34 +93,25 @@ var purchase = function(userId, products){
 // get history
 var getHistory = function(username){
   return new Promise((resolve, reject) => {
-    UserModel.findOne({username: username}, {userId:1}, function(err, user){
+    UserModel.findOne({username: username}, {_id:1}, function(err, user){
       if(err){
         reject(err);
       } else {
         if(user){
-
-          PurchaseModel.findOne({userId:user.userId}, {products:1}, function(err, results){
-            fin_result = {}
-            for(let result of results.products){
-              let productName = result["productName"];
-              let quantity = result["quantity"];
-              if(productName in fin_result){
-                fin_result[productName]["quantity"] += quantity;
-              } else {
-                fin_result[productName] = {"productName": productName, "quantity": quantity};
+          PurchaseModel.findOne({userId:user._id}, {products:1}, function(err, results){
+            if(err){
+              reject(err);
+            } else {
+              if(!results){
+                resolve([]);
               }
-            }
-            return_result = []
-            for(let tem in fin_result){
-              return_result.push(fin_result[tem]);
-            }
-            PurchaseModel.updateOne({userId:user.userId}, {products: return_result}, function(err, success){
-              if(err){
-                reject(err);
-              } else {
-                resolve(return_result);
+              return_result = [];
+              q = results.products;
+              for(let key in q){
+                return_result.push({productName: key, quantity: q[key]});
               }
-            });
+              resolve(return_result);
+            }
           });
         } else {
           reject({message: common.NO_USER});
@@ -172,7 +188,6 @@ var getRecommendations = function(asin){
             }
           }
         });
-
       } else {
         reject({message: common.NO_RECOMMENDATIONS});
       }

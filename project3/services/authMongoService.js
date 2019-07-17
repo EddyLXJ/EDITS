@@ -2,6 +2,19 @@
 var UserModel = require('../models/mongoUser');
 var common = require('../common/common');
 
+let adminUser = {
+    fname: "Jenny",
+    lname: "asdf",
+    address: "address",
+    city: "city",
+    state: "state",
+    zip: "zip",
+    email: "email",
+    username: "jadmin",
+    password: "admin"
+}
+// let new_adminUser = new UserModel(adminUser);
+// new_adminUser.save();
 //find user
 var find = function(username) {
   return new Promise((resolve, reject) => {
@@ -30,16 +43,12 @@ var register = function(fname, lname, address, city, state, zip, email, username
   }
 
   return new Promise((resolve, reject) => {
-    UserModel.findOne({username:username}, function(err, user){
-      if(user){
-        reject({message: common.INPUT_INVALID});
+    UserModel.updateOne({username:username}, {$setOnInsert: newUser, $set: {}}, {upsert: true}, function(err, result){
+      console.log(result);
+      if("upserted" in result){
+        resolve(newUser.fname);
       } else {
-        UserModel.count({}, function(err, num){
-          var nUser = new UserModel(newUser);
-          nUser.userId = num + 1;
-          nUser.save();
-          resolve(nUser.fname);
-        });
+        reject({message: common.INPUT_INVALID});
       }
     });
   });
@@ -48,30 +57,14 @@ var register = function(fname, lname, address, city, state, zip, email, username
 //update user information
 var update = function(userId, parameter){
   return new Promise((resolve, reject) => {
-    if("username" in parameter){
-      var username = parameter["username"];
-      UserModel.findOne({username:username}, function(err, user){
-        if(user){
-          reject({message: common.INPUT_INVALID});
-        } else {
-          UserModel.updateOne({userId:userId}, parameter, function(err, user){
-            if(err){
-              reject(err);
-            } else {
-              resolve(user);
-            }
-          });
-        }
-      });
-    } else {
-      UserModel.updateOne({userId:userId}, parameter, function(err, user){
-        if(err){
-          reject(err);
-        } else {
-          resolve(user);
-        }
-      });
-    }
+    console.log(parameter);
+    UserModel.updateOne({userId:userId}, parameter, function(err, user){
+      if(err){
+        reject({message: common.INPUT_INVALID});
+      } else {
+        resolve(user);
+      }
+    });
   });
 }
 
@@ -90,11 +83,19 @@ var viewUser = function(parameter) {
   }
 
   return new Promise((resolve, reject) => {
-    UserModel.find(parameter1, {_id:0, fname: 1, lname:1, userId:1}, function(err, user){
+    UserModel.find(parameter1, {_id:1, fname: 1, lname:1}, function(err, user){
       if(err){
         reject(err);
       } else {
-        resolve(user);
+        reture_user = []
+        for(let u of user){
+          tem = {}
+          tem["userId"] = u["_id"];
+          tem["fname"] = u["fname"];
+          tem["lname"] = u["lname"];
+          reture_user.push(tem);
+        }
+        resolve(reture_user);
       }
     });
   });

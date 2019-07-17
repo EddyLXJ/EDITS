@@ -4,7 +4,8 @@ var productSchema = mongoose.Schema({
   asin:String,
   productName:String,
   productDescription:String,
-  group:[String],
+  group:String,
+  //quantity: {type: Number, default:0}
 });
 
 var productModel = mongoose.model("ProductModel", productSchema);

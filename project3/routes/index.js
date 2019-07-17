@@ -44,7 +44,7 @@ router.post('/registerUser', jsonParser, function( req, res){
                   res.json({message: fname + common.REGISTER_SUCCESS});
                 }, function( error ){
                   res.json(error);
-                })
+                });
   }
 });
 
@@ -62,6 +62,7 @@ router.post('/updateInfo', jsonParser, function( req, res) {
                     } else{
                       var name = sess.fname;
                     }
+                    console.log(success);
                     res.json({message: name + common.INFO_UPDATED});
                   }, function( error ){
                     res.json(error);
@@ -74,6 +75,7 @@ router.post('/updateInfo', jsonParser, function( req, res) {
 
 // Login
 router.post('/login',jsonParser, function( req, res){
+  console.log(req);
   const username = req.body.username;
   const password = req.body.password;
   authService.find(username)
@@ -91,7 +93,7 @@ router.post('/login',jsonParser, function( req, res){
                       req.session.role = "normal"
                     }
                     req.session.loginUser = username;
-                    req.session.userId = result.userId;
+                    req.session.userId = result._id;
                     req.session.fname = result.fname;
                     res.json({message: common.WELCOME + result.fname});
                   });
@@ -130,21 +132,16 @@ router.post('/addProducts', jsonParser, function( req, res) {
   var loginUser = sess.loginUser;
   if (loginUser) {
     if(sess.role == "admin"){
+      console.log(asin, productName, productDescription, group);
       if(asin == null || asin.length == 0 || productName == null || productName.length == 0 || productDescription == null || productDescription.length == 0 || group == null || group.length == 0){
         res.json({message: common.INPUT_INVALID});
       } else {
-        productService.findProductByAsin(asin)
-                    .then(function(result){
-                      res.json({message: common.INPUT_INVALID});
-                    }, function(error) {
-                      productService.addProduct(asin, productName, productDescription, group)
-                                    .then(function(success){
-                                      console.log(productName);
-                                      res.json({message: productName + common.ADD_PRODUCT});
-                                    }, function(error) {
-                                      res.json({message: common.INPUT_INVALID});
-                                    });
-                    });
+        productService.addProduct(asin, productName, productDescription, group)
+                      .then(function(success){
+                        res.json({message: productName + common.ADD_PRODUCT});
+                      }, function(error) {
+                        res.json({message: common.INPUT_INVALID});
+                      });
       }
     } else {
       res.json({message: common.MUST_ADMIN});
@@ -212,11 +209,14 @@ router.post('/viewProducts', jsonParser, function( req, res) {
                 .then(function(results) {
                   if(results.length != 0){
                     res.json({product: results});
+                    res.end();
                   } else {
                     res.json({message: common.NO_PRODUCTS});
+                    res.end();
                   }
                 }, function(error){
                   res.json({message: "Other errors"});
+                  res.end();
                 });
 });
 
@@ -230,10 +230,6 @@ router.post('/buyProducts', jsonParser, function( req, res) {
     purchaseService.purchase(userId, products)
                   .then(function(result){
                     if(result == "success"){
-
-                      if(products.length > 1){
-                        purchaseService.updateRecommendation(products);
-                      }
                       res.json({message:common.ACTION_SUCCESS});
                     } else {
                       res.json({message:common.NO_PRODUCTS});

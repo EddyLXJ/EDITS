@@ -22,19 +22,19 @@ var findProductByAsin = function(asin){
 var addProduct = function(asin, productName, productDescription, group){
   return new Promise((resolve, reject) => {
     newProduct = {
-      asin: asin,
       productName: productName,
       productDescription: productDescription,
-      group:[group]
+      group:group
     }
-    ProductModel.findOne({asin:asin}, function(error, product){
-        if(product){
-          reject("Product already exist");
-        } else {
-          var nProduct = new ProductModel(newProduct);
-          nProduct.save();
-          resolve(nProduct);
-        }
+    // $inc:{quantity:1}
+    ProductModel.updateOne({asin:asin},{$setOnInsert: {productName: productName,productDescription: productDescription,group:group}, $set:{}}, {upsert: true}, function(error, product){
+      console.log(product);
+      if("upserted" in product){
+        resolve(newProduct);
+      } else {
+        reject("Empty Set");
+      }
+
     });
   });
 }
@@ -42,23 +42,21 @@ var addProduct = function(asin, productName, productDescription, group){
 // update Product
 var updateProduct = function(asin, productName, productDescription, group) {
   return new Promise((resolve, reject) => {
-    product = {
+    new_product = {
       asin:asin,
       productName:productName,
       productDescription: productDescription,
-      group:[group]
+      group:group
     }
-    ProductModel.findOne({asin:asin}, function(error, product) {
-      if(product){
-        ProductModel.updateOne({asin:asin},product,function(err, product){
-          if(err){
-            reject(err);
-          } else {
-            resolve(product);
-          }
-        });
+    ProductModel.findOneAndUpdate({asin:asin}, {$set: {productName:productName, productDescription: productDescription,group:group}}, {new: true}, function(err, product) {
+      if(err){
+        reject(err);
       } else {
-        reject("Empty set");
+        if(!product){
+          reject("Empty Set")
+        } else {
+          resolve(product);
+        }
       }
     });
   });
@@ -70,17 +68,18 @@ var viewProduct = function(parameter){
   if("asin" in parameter){
     parameter1["asin"] = parameter.asin;
   }
-  if("group" in parameter){
-    parameter1["group"] = [[parameter.group]];
-  }
   if("keyword" in parameter){
     parameter1["$or"] = [
       {"productName": {"$regex":parameter.keyword}},
       {"productDescription": {"$regex":parameter.keyword}}
     ];
   }
+  if("group" in parameter){
+    parameter1["group"] = parameter.group;
+  }
+
   return new Promise((resolve, reject) => {
-    ProductModel.find(parameter1, {_id:0, asin:1, productName: 1}, function(err, product) {
+    ProductModel.find(parameter1,{_id:0, asin:1, productName:1},{limit: 100}, function(err, product) {
       if(err){
         reject(err);
       } else {
