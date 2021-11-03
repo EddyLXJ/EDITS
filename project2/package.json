@@ -21,6 +21,6 @@
     "nodemon": "^1.19.1",
     "sequelize": "^5.8.10",
     "session-file-store": "^1.2.0",
-    "validator": "^11.0.0"
+    "validator": "^13.7.0"
   }
 }
